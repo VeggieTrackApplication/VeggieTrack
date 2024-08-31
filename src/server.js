@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 app.get('/', (req, res) => {
-    res.send("Hello World!");
+    res.send("Hello Worlds!");
 })
 
 app.listen(port, '0.0.0.0', () => {
