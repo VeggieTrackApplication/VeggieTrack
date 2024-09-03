@@ -99,7 +99,7 @@
  * 
  * fb.saveBatch(...); -> FOR ADD AND UPDATE
  * fb.getBatches(courierId); === Array of Batches [ {[ {...}, {...}, {...} ]}, {[ {...}, {...}, {...} ]}, {[ {...}, {...}, {...} ]} ]
- * fb.getBatch(batchId); === Batch [{...}, {...}, {...}]
+ * fb.getBatch(id); === Batch [{...}, {...}, {...}]
  * 
  * FOR COURIER -> TRANSPORTS
  * /save-transport      POST [...]
@@ -113,6 +113,8 @@
  * fb.updateTransportStatus(id, status);
  * 
  * 
+ * EMAIL: veggietrack@gmail.com
+ * PASSWORD: VeggieTrackApplication
  */
 
 const express = require('express');
