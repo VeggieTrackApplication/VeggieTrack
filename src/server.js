@@ -104,7 +104,7 @@
  * FOR COURIER -> TRANSPORTS
  * /save-transport      POST [...]
  * /get-transport       PUT [id]
- * /delete-transport    PUT [id]
+ * /delete-transport    DELETE [id]
  * /update-transport-status POST [id, status]
  * 
  * fb.saveTransport(...); -> FOR ADD and UPDATE
@@ -128,8 +128,145 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 app.get('/', (req, res) => {
+    //body {id, name, email, password, ...}
+    // const { id, name, email, password } = req.body;
+    // generateUniqueId('F');
+
     res.send("Hello World!");
 })
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    res.send(email + " " + password);
+});
+
+
+app.post('/save-farmer', (req, res) => {
+    const id = generateUniqueId('F');
+    const { email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize } = req.body;
+    const farmer = {
+        id, email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize
+    }    
+    res.send(farmer);
+});
+
+app.get('/get-all-farmers', (req, res) => {
+    res.send(null);
+});
+
+app.put('/get-farmer', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.delete('/delete-farmer', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.post('/save-harvest', (req, res) => {
+    const id = generateUniqueId('H');
+    const { farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId } = req.body;
+    const harvest = {
+        farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
+    };
+    res.send(harvest);
+});
+
+app.put('/get-all-harvest', (req, res) => {
+    const { farmerId } = req.body;
+    res.send(farmerId);
+});
+
+app.put('/get-harvest', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.delete('/delete-harvest', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.post('/save-courier', (req, res) => {
+    const id = generateUniqueId('C');
+    const { email, password, fullName } = req.body;
+    const courier = {
+        email, password, fullName
+    };
+    res.send(courier);
+});
+
+app.get('/get-all-couriers', (req, res) => {
+    res.send(null);
+});
+
+app.put('/get-courier', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.delete('/delete-courier', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.post('/save-batch', (req, res) => {
+    const { id } = generateUniqueId('B');
+    const { courierId, transportId } = req.body;
+    const batch = {
+        courierId, transportId
+    };
+    res.send(batch)
+});
+
+app.put('/get-all-batches', (req, res) => {
+    const { courierId } = req.body;
+    req.res(courierId);
+});
+
+app.get('/get-batch', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.post('/save-transport', (req, res) => {
+    const { id } = generateUniqueId('T');
+    const { batchId, harvestId, courierId, pickUpDate, deliveryDate, status } = req.body;
+    const transport = {
+        batchId, harvestId, courierId, pickUpDate, deliveryDate, status
+    };
+    res.send(transport);
+});
+
+app.put('/get-transport', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.delete('/delete-transport', (req, res) => {
+    const { id } = req.body;
+    res.send(id);
+});
+
+app.post('/update-transport-status', (req, res) => {
+    const { id, status } = req.body;
+    res.send(id, status);
+});
+
+function generateUniqueId(idType) {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+
+    return `${idType.toUpperCase()}${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
+}
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running at ${ port }`);
