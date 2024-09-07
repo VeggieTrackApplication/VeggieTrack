@@ -143,117 +143,136 @@ app.post('/login', (req, res) => {
 });
 
 
-app.post('/save-farmer', (req, res) => {
+app.post('/save-farmer', async (req, res) => {
     const id = generateUniqueId('F');
     const { email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize } = req.body;
     const farmer = {
         id, email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize
-    }    
-    res.send(farmer);
+    }
+    const response = await fb.saveFarmer(farmer);
+    res.send(response);
 });
 
-app.get('/get-all-farmers', (req, res) => {
-    res.send(null);
+app.get('/get-all-farmers', async (req, res) => {
+    const response = await fb.getFarmers();
+    res.send(response);
 });
 
-app.put('/get-farmer', (req, res) => {
+app.put('/get-farmer', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.getFarmer(id);
+    res.send(response);
 });
 
-app.delete('/delete-farmer', (req, res) => {
+app.delete('/delete-farmer', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+   const response = await fb.deleteFarmer(id);
+    res.send(response);
 });
 
-app.post('/save-harvest', (req, res) => {
+app.post('/save-harvest', async (req, res) => {
     const id = generateUniqueId('H');
     const { farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId } = req.body;
     const harvest = {
         farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
     };
-    res.send(harvest);
+    const response = await fb.saveHarvest(harvest);
+    res.send(response);
 });
 
-app.put('/get-all-harvest', (req, res) => {
+app.put('/get-all-harvest', async (req, res) => {
     const { farmerId } = req.body;
-    res.send(farmerId);
+    const response = await fb.getHarvests(farmerId);
+    res.send(response);
 });
 
-app.put('/get-harvest', (req, res) => {
+app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.getHarvest(id);
+    res.send(response);
 });
 
-app.delete('/delete-harvest', (req, res) => {
+app.delete('/delete-harvest', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.deleteHarvest(id);
+    res.send(response);
 });
 
-app.post('/save-courier', (req, res) => {
+app.post('/save-courier', async (req, res) => {
     const id = generateUniqueId('C');
     const { email, password, fullName } = req.body;
     const courier = {
         email, password, fullName
     };
-    res.send(courier);
+    const response = await fb.saveCourier(courier);
+    res.send(response);
 });
 
-app.get('/get-all-couriers', (req, res) => {
-    res.send(null);
+app.get('/get-all-couriers', async (req, res) => {
+    const response = await fb.getCouriers();
+    res.send(response);
 });
 
-app.put('/get-courier', (req, res) => {
+app.put('/get-courier', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.getCourier(id);
+    res.send(response);
 });
 
-app.delete('/delete-courier', (req, res) => {
+app.delete('/delete-courier', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.deleteCourier(id)
+    res.send(response);
 });
 
-app.post('/save-batch', (req, res) => {
+app.post('/save-batch', async (req, res) => {
     const { id } = generateUniqueId('B');
     const { courierId, transportId } = req.body;
     const batch = {
         courierId, transportId
     };
-    res.send(batch)
+    const response = await fb.saveBatch(batch);
+    res.send(response);
 });
 
-app.put('/get-all-batches', (req, res) => {
+app.put('/get-all-batches', async (req, res) => {
     const { courierId } = req.body;
-    req.res(courierId);
+    const response = await fb.getBatches(courierId);
+    req.res(response);
 });
 
-app.get('/get-batch', (req, res) => {
+app.get('/get-batch', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.getBatch(id)
+    res.send(response);
 });
 
-app.post('/save-transport', (req, res) => {
+app.post('/save-transport', async (req, res) => {
     const { id } = generateUniqueId('T');
     const { batchId, harvestId, courierId, pickUpDate, deliveryDate, status } = req.body;
     const transport = {
         batchId, harvestId, courierId, pickUpDate, deliveryDate, status
     };
-    res.send(transport);
+    const response = await fb.saveTransport(transport);
+    res.send(response);
 });
 
-app.put('/get-transport', (req, res) => {
+app.put('/get-transport', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.getTransport(id);
+    res.send(response);
 });
 
-app.delete('/delete-transport', (req, res) => {
+app.delete('/delete-transport', async (req, res) => {
     const { id } = req.body;
-    res.send(id);
+    const response = await fb.deleteTransport(id);
+    res.send(response);
 });
 
-app.post('/update-transport-status', (req, res) => {
+app.post('/update-transport-status', async (req, res) => {
     const { id, status } = req.body;
-    res.send(id, status);
+    const response = await fb.updateTransportStatus(id, status);
+    res.send(response);
 });
 
 function generateUniqueId(idType) {
