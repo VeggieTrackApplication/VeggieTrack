@@ -122,7 +122,7 @@ const path = require('path');
 const fb = require('./fb/firebaseUtility');
 const app = express();
 
-const port = 8080;
+const port = 10000;
 
 const publicPath = path.resolve(__dirname, 'public');
 
