@@ -286,6 +286,15 @@ function generateUniqueId(idType) {
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
 
+    console.log(now);
+    console.log(year);
+    console.log(month);
+    console.log(day);
+    console.log(hours);
+    console.log(minutes);
+    console.log(seconds);
+    console.log(milliseconds);
+
     return `${idType.toUpperCase()}${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
 }
 
