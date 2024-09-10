@@ -174,7 +174,7 @@ app.post('/save-harvest', async (req, res) => {
     const id = generateUniqueId('H');
     const { farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId } = req.body;
     const harvest = {
-        farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
+        id, farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
     };
     const response = await fb.saveHarvest(harvest);
     res.send(response);
@@ -202,7 +202,7 @@ app.post('/save-courier', async (req, res) => {
     const id = generateUniqueId('C');
     const { email, password, fullName } = req.body;
     const courier = {
-        email, password, fullName
+        id, email, password, fullName
     };
     const response = await fb.saveCourier(courier);
     res.send(response);
@@ -229,7 +229,7 @@ app.post('/save-batch', async (req, res) => {
     const { id } = generateUniqueId('B');
     const { courierId, transportId } = req.body;
     const batch = {
-        courierId, transportId
+        id, courierId, transportId
     };
     const response = await fb.saveBatch(batch);
     res.send(response);
@@ -251,7 +251,7 @@ app.post('/save-transport', async (req, res) => {
     const { id } = generateUniqueId('T');
     const { batchId, harvestId, courierId, pickUpDate, deliveryDate, status } = req.body;
     const transport = {
-        batchId, harvestId, courierId, pickUpDate, deliveryDate, status
+        id, batchId, harvestId, courierId, pickUpDate, deliveryDate, status
     };
     const response = await fb.saveTransport(transport);
     res.send(response);
