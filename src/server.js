@@ -291,7 +291,7 @@ app.post('/update-transport-status', async (req, res) => {
 app.post('/generate-qr', async (req, res) => {
     const { id } = req.body;
     try {
-        const qrCodeData = 'https://veggietrack.com/info';
+        const qrCodeData = 'https://veggietrack.onrender.com/info';
         
         const crypted = qrCodeData + "/" + encrypt(id)
         const qrCodeBuffer = await QRCode.toBuffer(crypted);
@@ -319,15 +319,6 @@ function generateUniqueId(idType) {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
-
-    console.log(now);
-    console.log(year);
-    console.log(month);
-    console.log(day);
-    console.log(hours);
-    console.log(minutes);
-    console.log(seconds);
-    console.log(milliseconds);
 
     return `${idType.toUpperCase()}${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
 }
