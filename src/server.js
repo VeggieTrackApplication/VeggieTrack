@@ -180,7 +180,7 @@ app.post('/save-harvest', async (req, res) => {
     res.send(response);
 });
 
-app.put('/get-all-harvest', async (req, res) => {
+app.put('/get-all-harvests', async (req, res) => {
     const { farmerId } = req.body;
     const response = await fb.getHarvests(farmerId);
     res.send(response);
