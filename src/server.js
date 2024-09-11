@@ -129,8 +129,8 @@ const app = express();
 
 const port = 10000;
 
-const ENCRYPTION_KEY = crypto.randomBytes(32);
-const IV_LENGTH  = 16;
+const ENCRYPTION_KEY = crypto.createHash('sha256').update('veggie-track-key').digest(); // Hash to make it 32 bytes
+const IV_LENGTH = Buffer.from('1234567890123456')
 
 const publicPath = path.resolve(__dirname, 'public');
 
@@ -196,7 +196,12 @@ app.put('/get-all-harvests', async (req, res) => {
 
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
-    const response = await fb.getHarvest(decrypt(id));
+    const decryptedId = decrypt(id);
+    if (decryptedId == 0) {
+        res.send('404');
+        return;
+    }
+    const response = await fb.getHarvest(decryptedId);
     res.send(response);
 });
 
@@ -327,45 +332,23 @@ function generateUniqueId(idType) {
     return `${idType.toUpperCase()}${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
 }
 
-function base64UrlEncode(input) {
-    return input.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  }
-  
-  function base64UrlDecode(input) {
-    input = input.replace(/-/g, '+').replace(/_/g, '/');
-    const pad = input.length % 4;
-    if (pad) {
-      input += '='.repeat(4 - pad);
-    }
-    return input;
-  }
+function encrypt(text) {
+    const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, IV_LENGTH);
 
-  function encrypt(id) {
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
-  
-    let encrypted = cipher.update(id.toString(), 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-  
-    const encryptedString = iv.toString('base64') + encrypted;
-  
-    const safeEncodedString = base64UrlEncode(encryptedString);
-  
-    return safeEncodedString.slice(0, 10);
-  }
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
 
-  function decrypt(encryptedText) {
-    const decodedText = base64UrlDecode(encryptedText);
-    const iv = Buffer.from(decodedText.slice(0, 24), 'base64');
-    const encrypted = decodedText.slice(24);
-  
-    const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
-    let decrypted = decipher.update(encrypted, 'base64', 'utf8');
+    return encrypted;
+}
+
+function decrypt(encrypted) {
+    const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, IV_LENGTH);
+    
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-  
+
     return decrypted;
-  }
-  
+}
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running at ${ port }`);

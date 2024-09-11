@@ -3,9 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Vegetable Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            padding: 10px;
+            color: white;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+            background-color: #ccc;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto; /* Allows horizontal scrolling */
+        }
+
+        table {
+            width: 100%; /* Ensures the table takes full width of its container */
+            border-collapse: collapse;
+            min-width: 800px; /* Ensures the table doesn't get too narrow */
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    Yes success! WUhoooooo!
+
+    <div class="container">
+        <div class="header">
+            <h1>Vegetable Information</h1>
+        </div>
+
+        <div class="info-container">
+            <div class="info">
+                <div class="image-placeholder">
+                    Image
+                </div>
+                <p>Farm Name: <span id="farmName"></span></p>
+                <p>Farm Location: <span id="farmLocation"></span></p>
+                <p>Farm Size: <span id="farmSize"></span></p>
+                <p>Vegetable Name: <span id="vegetableName"></span></p>
+                <p>Harvest Date: <span id="dateHarvested"></span></p>
+                <p>Date Planted: <span id="datePlanted"></span></p>
+                <p>Fertilizer Used: <span id="fertilizerUsed"></span></p>
+                <p>Pesticides Used: <span id="pesticidesUsed"></span></p>
+                <p>Kilo Produced: <span id="kiloProduced"></span></p>
+                <p>Courier: <span id="courier"></span></p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>Transportation History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Courier</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Price From Farm</th>
+                        <th>Price From Retailer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            © 2024 Vegetable Dashboard. All rights reserved.
+        </div>
+    </div>
+    <script>
+        const extractId = () => {
+            const path = window.location.pathname;
+            const parts = path.split('/');
+            return parts[parts.length - 1];
+        }
+
+        const getFarm = async (id) => {
+            const url = '/get-farmer';
+            const data = { id };
+            const result = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const response = await result.json();
+            if (response == 404) {
+                console.log("Farmer not found!");
+                return null;
+            } else {
+                return response;
+            }
+        }
+
+        const getHarvest = async (id) => {
+            const url = '/get-harvest';
+            const data = { id };
+            const result = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const response = await result.json();
+            if (response == 404) {
+                console.log("Not found!");
+            } else {
+                response.farmer = await getFarm(response.farmerId);
+                displayData(response);
+            }
+        }
+
+        const displayData = async (response) => {
+            const farmName = document.getElementById('farmName');
+            const farmLocation = document.getElementById('farmLocation');
+            const farmSize = document.getElementById('farmSize');
+            const vegetableName = document.getElementById('vegetableName');
+            const dateHarvested = document.getElementById('dateHarvested');
+            const datePlanted = document.getElementById('datePlanted');
+            const fertilizerUsed = document.getElementById('fertilizerUsed');
+            const pesticidesUsed = document.getElementById('pesticidesUsed');
+            const kiloProduced = document.getElementById('kiloProduced');
+
+            farmName.innerHTML += response.farmer.farmName;
+            farmLocation.innerHTML += response.farmer.farmLocation;
+            farmSize.innerHTML += response.farmer.farmSize;
+            vegetableName.innerHTML += response.vegetableName;
+            dateHarvested.innerHTML += response.dateHarvested;
+            datePlanted.innerHTML += response.datePlanted;
+            fertilizerUsed.innerHTML += response.fertilizerUsed;
+            pesticidesUsed.innerHTML += response.pesticidesUsed;
+            kiloProduced.innerHTML += response.kiloProduced;
+        }
+
+        getHarvest(extractId());
+    </script>
 </body>
 </html>
