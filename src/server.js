@@ -112,6 +112,9 @@
  * fb.deleteTransport(id);
  * fb.updateTransportStatus(id, status);
  * 
+ * FOR QR
+ * /generate-qr         POST [id]
+ * /info/:id            GET => sendFile info.html
  * 
  * EMAIL: veggietrack@gmail.com
  * PASSWORD: VeggieTrackApplication
@@ -120,9 +123,14 @@
 const express = require('express');
 const path = require('path');
 const fb = require('./fb/firebaseUtility');
+const QRCode = require('qrcode');
+const crypto = require('crypto');
 const app = express();
 
 const port = 10000;
+
+const ENCRYPTION_KEY = crypto.randomBytes(32);
+const IV_LENGTH  = 16;
 
 const publicPath = path.resolve(__dirname, 'public');
 
@@ -188,7 +196,7 @@ app.put('/get-all-harvests', async (req, res) => {
 
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
-    const response = await fb.getHarvest(id);
+    const response = await fb.getHarvest(decrypt(id));
     res.send(response);
 });
 
@@ -275,6 +283,27 @@ app.post('/update-transport-status', async (req, res) => {
     res.send(response);
 });
 
+app.post('/generate-qr', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const qrCodeData = 'https://veggietrack.com/info';
+        
+        const crypted = qrCodeData + "/" + encrypt(id)
+        const qrCodeBuffer = await QRCode.toBuffer(crypted);
+    
+        res.setHeader('Content-Type', 'image/png');
+    
+        res.send(qrCodeBuffer);
+    } catch (error) {
+        res.status(500).send('Failed to generate QR code');
+    }
+
+});
+
+app.get('/info/:id', (req, res) => {
+    res.sendFile(path.join(publicPath, 'info.html'));
+});
+
 function generateUniqueId(idType) {
     const now = new Date();
 
@@ -297,6 +326,46 @@ function generateUniqueId(idType) {
 
     return `${idType.toUpperCase()}${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
 }
+
+function base64UrlEncode(input) {
+    return input.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  
+  function base64UrlDecode(input) {
+    input = input.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = input.length % 4;
+    if (pad) {
+      input += '='.repeat(4 - pad);
+    }
+    return input;
+  }
+
+  function encrypt(id) {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+  
+    let encrypted = cipher.update(id.toString(), 'utf8', 'base64');
+    encrypted += cipher.final('base64');
+  
+    const encryptedString = iv.toString('base64') + encrypted;
+  
+    const safeEncodedString = base64UrlEncode(encryptedString);
+  
+    return safeEncodedString.slice(0, 10);
+  }
+
+  function decrypt(encryptedText) {
+    const decodedText = base64UrlDecode(encryptedText);
+    const iv = Buffer.from(decodedText.slice(0, 24), 'base64');
+    const encrypted = decodedText.slice(24);
+  
+    const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+    let decrypted = decipher.update(encrypted, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
+  
+    return decrypted;
+  }
+  
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running at ${ port }`);
