@@ -145,9 +145,10 @@ app.get('/', (req, res) => {
     res.send("Hello World!");
 })
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    res.send(email + " " + password);
+    const response = await fb.checkLogin(email, password);
+    res.send(response);
 });
 
 
