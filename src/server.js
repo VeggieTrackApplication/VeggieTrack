@@ -129,7 +129,7 @@ const app = express();
 
 const port = 10000;
 
-const ENCRYPTION_KEY = crypto.createHash('sha256').update('veggie-track-key').digest(); // Hash to make it 32 bytes
+const ENCRYPTION_KEY = crypto.createHash('sha256').update('veggie-track-key').digest();
 const IV_LENGTH = Buffer.from('1234567890123456')
 
 const publicPath = path.resolve(__dirname, 'public');
@@ -198,7 +198,7 @@ app.put('/get-all-harvests', async (req, res) => {
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
     const decryptedId = decrypt(id);
-    if (decryptedId == 0) {
+    if (!decryptedId) {
         res.send('404');
         return;
     }
@@ -314,7 +314,7 @@ function generateUniqueId(idType) {
     const now = new Date();
 
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -334,12 +334,16 @@ function encrypt(text) {
 }
 
 function decrypt(encrypted) {
-    const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, IV_LENGTH);
+    try {
+        const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, IV_LENGTH);
+        
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
     
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-
-    return decrypted;
+        return decrypted;
+    } catch (error) {
+        return null;
+    }
 }
 
 app.listen(port, '0.0.0.0', () => {

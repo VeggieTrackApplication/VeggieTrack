@@ -173,8 +173,8 @@
                 body: JSON.stringify(data)
             });
             const response = await result.json();
-            if (response == 404) {
-                console.log("Not found!");
+            if (response == '404') {
+                alert("Harvest not found!");
             } else {
                 response.farmer = await getFarm(response.farmerId);
                 displayData(response);
