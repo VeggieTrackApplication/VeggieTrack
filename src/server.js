@@ -252,7 +252,7 @@ app.post('/save-batch', async (req, res) => {
 app.put('/get-all-batches', async (req, res) => {
     const { courierId } = req.body;
     const response = await fb.getBatches(courierId);
-    req.res(response);
+    res.send(response);
 });
 
 app.get('/get-batch', async (req, res) => {
