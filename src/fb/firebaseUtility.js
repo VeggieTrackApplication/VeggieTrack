@@ -128,7 +128,15 @@ const getHarvests = async (farmerId) => {
 };
 
 const getHarvest = async (id) => {
-    return await getSingleData(harvestNode, id);
+    const harvestResponse = await getSingleData(harvestNode, id);
+    if(harvestResponse.transportId == '0') {
+        return harvestResponse;
+    }
+    const transportResponse = await getSingleData(transportType, harvestResponse.transportId);
+    return {
+        ...harvestResponse,
+        transport: transportResponse
+    }
 };
 
 const deleteHarvest = async (id) => {
