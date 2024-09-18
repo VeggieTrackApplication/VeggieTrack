@@ -27,6 +27,18 @@ const saveData = async (dataType, data) => {
     }
 };
 
+const updateData = async (dataType, data) => {
+    const { id } = data;
+
+    try {
+        await db.collection(dataType).doc(String(id)).update(data);
+        return 'success';
+    } catch (error) {
+        console.log('error: ', error.message);
+        return 'failed';
+    }
+};
+
 const getData = async (dataType) => {
     try {
         const response = await db.collection(dataType).get();
@@ -124,7 +136,7 @@ const deleteHarvest = async (id) => {
 };
 
 const updateHarvestTransportId = async (harvest) => {
-    return await saveData(harvestNode, harvest);
+    return await updateData(harvestNode, harvest);
 };
 
 const saveCourier = async (courier) => {
