@@ -133,9 +133,11 @@ const getHarvest = async (id) => {
         return harvestResponse;
     }
     const transportResponse = await getSingleData(transportType, harvestResponse.transportId);
+    const courierResponse = await getSingleData(courierNode, transportResponse.courierId);
     return {
         ...harvestResponse,
-        transport: transportResponse
+        transport: transportResponse,
+        courier: courierResponse
     }
 };
 
