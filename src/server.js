@@ -125,6 +125,7 @@ const path = require('path');
 const fb = require('./fb/firebaseUtility');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
+const moment = require('moment');
 const app = express();
 
 const port = 10000;
@@ -239,11 +240,39 @@ app.delete('/delete-courier', async (req, res) => {
     res.send(response);
 });
 
-app.post('/save-batch', async (req, res) => {
-    const { id } = generateUniqueId('B');
-    const { courierId, transportId } = req.body;
+app.post('/save-batch-with-transport', async (req, res) => {
+    const bId = generateUniqueId('B');
+    const { courierId, transports } = req.body;
+    const transportIds = [];
+    for(var i = 0; i < harvests.length; i++) {
+        const tId = generateUniqueId('T');
+        const { harvestId, deliveryDate, status } = transports[i];
+        const transport = {
+            id: tId, batchId: bId, harvestId, courierId, pickUpDate: moment().format('MMMM, DD, YYYY'), deliveryDate, status
+        };
+        const response = await fb.saveTransport(transport);
+        if (response == 'success') {
+            const updateHarvest = fb.updateTransportStatus({id: harvestId, transportId: tId})
+            if (updateHarvest == 'failed') {
+                console.log('WARNING: ', `Harvest ID ${ harvestId } wasn't updated! Transport ID for it is ${ tId }`);
+            }
+            transportIds.push(tId);
+        } else {
+            return response;
+        }
+    }
     const batch = {
-        id, courierId, transportId
+        id: bId, courierId, transportIds
+    }
+    const batchResponse = await fb.saveBatch(batch);
+    res.send(batchResponse);
+});
+
+app.post('/save-batch', async (req, res) => {
+    const id = generateUniqueId('B');
+    const { courierId, transportIds } = req.body;
+    const batch = {
+        id, courierId, transportIds
     };
     const response = await fb.saveBatch(batch);
     res.send(response);
@@ -262,7 +291,7 @@ app.get('/get-batch', async (req, res) => {
 });
 
 app.post('/save-transport', async (req, res) => {
-    const { id } = generateUniqueId('T');
+    const id = generateUniqueId('T');
     const { batchId, harvestId, courierId, pickUpDate, deliveryDate, status } = req.body;
     const transport = {
         id, batchId, harvestId, courierId, pickUpDate, deliveryDate, status

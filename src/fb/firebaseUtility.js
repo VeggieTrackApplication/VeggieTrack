@@ -123,6 +123,10 @@ const deleteHarvest = async (id) => {
     return await deleteData(harvestNode, id);
 };
 
+const updateHarvestTransportId = async (harvest) => {
+    return await saveData(harvestNode, harvest);
+};
+
 const saveCourier = async (courier) => {
     return await saveData(courierNode, courier);
 };
