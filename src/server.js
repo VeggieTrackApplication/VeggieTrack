@@ -252,7 +252,7 @@ app.post('/save-batch-with-transport', async (req, res) => {
         };
         const response = await fb.saveTransport(transport);
         if (response == 'success') {
-            const updateHarvest = fb.updateTransportStatus({id: harvestId, transportId: tId})
+            const updateHarvest = fb.updateHarvestTransportId({id: harvestId, transportId: tId})
             if (updateHarvest == 'failed') {
                 console.log('WARNING: ', `Harvest ID ${ harvestId } wasn't updated! Transport ID for it is ${ tId }`);
             }

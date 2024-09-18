@@ -201,6 +201,7 @@ module.exports = {
     getHarvests,
     getHarvest,
     deleteHarvest,
+    updateHarvestTransportId,
 
     saveCourier,
     getCouriers,
