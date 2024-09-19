@@ -294,6 +294,7 @@ app.put('/get-batch', async (req, res) => {
     for(var i = 0; i < transportIds.length; i++) {
         const transportId = transportIds[i];
         const transport = await fb.getTransport(transportId);
+        transport.harvest.encryptedId = encrypt(transport.harvest.id);
         transports.push(transport);
     }
     
