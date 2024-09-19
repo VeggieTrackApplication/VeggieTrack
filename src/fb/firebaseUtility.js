@@ -194,7 +194,12 @@ const saveTransport = async (transport) => {
 };
 
 const getTransport = async (id) => {
-    return await getSingleData(transportType, id);
+    const transport = await getSingleData(transportType, id);
+    const harvest = await getSingleData(harvestNode, transport.harvestId);
+    return {
+        ...transport,
+        harvest
+    }
 };
 
 const deleteTransport = async (id) => {

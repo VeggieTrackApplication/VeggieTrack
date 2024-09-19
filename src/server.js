@@ -284,10 +284,23 @@ app.put('/get-all-batches', async (req, res) => {
     res.send(response);
 });
 
-app.get('/get-batch', async (req, res) => {
+app.put('/get-batch', async (req, res) => {
     const { id } = req.body;
-    const response = await fb.getBatch(id)
-    res.send(response);
+
+    const batch = await fb.getBatch(id);
+    const transportIds = batch.transportIds;
+
+    const transports = [];
+    for(var i = 0; i < transportIds.length; i++) {
+        const transportId = transportIds[i];
+        const transport = await fb.getTransport(transportId);
+        transports.push(transport);
+    }
+    
+    res.send({
+        ...batch,
+        transports
+    });
 });
 
 app.post('/save-transport', async (req, res) => {
@@ -313,8 +326,14 @@ app.delete('/delete-transport', async (req, res) => {
 });
 
 app.post('/update-transport-status', async (req, res) => {
-    const { id, status } = req.body;
-    const response = await fb.updateTransportStatus(id, status);
+    const { harvestId, status } = req.body;
+    const decrypted = decrypt(harvestId);
+    if (!decrypted) {
+        res.send('failed');
+        return;
+    }
+    const harvest = await fb.getHarvest(decrypted);
+    const response = await fb.updateTransportStatus(harvest.transportId, status);
     res.send(response);
 });
 
