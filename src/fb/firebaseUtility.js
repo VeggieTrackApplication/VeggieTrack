@@ -208,7 +208,11 @@ const deleteTransport = async (id) => {
 
 const updateTransportStatus = async (id, status) => {
     try {
-        await db.collection(transportType).doc(String(id)).update({ status });
+        const currentDate = new Date();
+        const formattedDate = currentDate.getFullYear() + '-' +
+            String(currentDate.getMonth() + 1).padStart(2, '0') + '-' +
+            String(currentDate.getDate()).padStart(2, '0');
+        await db.collection(transportType).doc(String(id)).update({ status, deliveryDate: formattedDate});
         return 'success';
     } catch (error) {
         console.log('error: ', error.message);
