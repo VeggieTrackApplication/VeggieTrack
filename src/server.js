@@ -157,7 +157,7 @@ app.post('/save-farmer', async (req, res) => {
     const id = generateUniqueId('F');
     const { email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize } = req.body;
     const farmer = {
-        id, email, password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize
+        id, email: email.toLowerCase(), password, firstName, lastName, middleName, birthdate, sex, region, province, city, postalCode, barangay, streetDetails, phoneNumber, farmLocation, farmName, farmSize
     }
     const response = await fb.saveFarmer(farmer);
     res.send(response);

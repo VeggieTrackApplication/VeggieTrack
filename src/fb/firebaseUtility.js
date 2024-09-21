@@ -75,7 +75,7 @@ const deleteData = async (dataType, id) => {
 
 const checkLogin = async (email, password) => {
     try {
-        const querySnapshot = await db.collection("farmer").where('email', '==', email).where('password', '==', password).get();
+        const querySnapshot = await db.collection("farmer").where('email', '==', email.toLowerCase()).where('password', '==', password).get();
         if (querySnapshot.empty) {
             const newQuerySnapshot = await db.collection("courier").where('email', '==', email).where('password', '==', password).get();
             if (newQuerySnapshot.empty) {
