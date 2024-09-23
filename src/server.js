@@ -126,6 +126,8 @@ const fb = require('./fb/firebaseUtility');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 const moment = require('moment');
+const multer = require('multer');
+const fs = require('fs');
 const app = express();
 
 const port = 10000;
@@ -134,6 +136,7 @@ const ENCRYPTION_KEY = crypto.createHash('sha256').update('veggie-track-key').di
 const IV_LENGTH = Buffer.from('1234567890123456')
 
 const publicPath = path.resolve(__dirname, 'public');
+const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 app.use(express.urlencoded());
@@ -359,6 +362,22 @@ app.get('/info/:id', (req, res) => {
     res.sendFile(path.join(publicPath, 'info.html'));
 });
 
+app.put('/get-undelivered-transports', async (req, res) => {
+    const { courierId } = req.body;
+    const response = await fb.getUndeliveredTransports(courierId);
+    res.send(response);
+});
+
+app.post('/save-transport-location-file', upload.single('file'), async (req, res) => {
+    const { transactionId } = req.body;
+    const filePath = path.join(__dirname, '../', req.file.path);
+    
+    const response = await fb.saveTransactionLocationFile(transactionId, req.file.originalname, filePath);
+    
+    fs.unlinkSync(filePath);
+    res.send(response);
+});
+
 function generateUniqueId(idType) {
     const now = new Date();
 
@@ -395,6 +414,6 @@ function decrypt(encrypted) {
     }
 }
 
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, '0.0.0.0', async () => {
     console.log(`Server is running at ${ port }`);
 });

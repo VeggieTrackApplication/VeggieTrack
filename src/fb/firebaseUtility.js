@@ -1,19 +1,22 @@
 const firebase = require('firebase-admin/app');
 const fs = require('firebase-admin/firestore');
+const admin = require('firebase-admin');
 
 const serviceAccount = require('./veggietrack-7a045-firebase-adminsdk-uf0zv-e1414b8b49.json');
 
 firebase.initializeApp({
-    credential: firebase.cert(serviceAccount)
+    credential: firebase.cert(serviceAccount),
+    storageBucket: 'gs://veggietrack-7a045.appspot.com'
 });
 
 const db = fs.getFirestore();
+const bucket = admin.storage().bucket();
 
 const farmerNode = 'farmer';
 const harvestNode = 'harvest';
 const courierNode = 'courier';
-const batchType = 'batch';
-const transportType = 'transport';
+const batchNode = 'batch';
+const transportNode = 'transport';
 
 const saveData = async (dataType, data) => {
     const { id } = data;
@@ -132,7 +135,7 @@ const getHarvest = async (id) => {
     if(harvestResponse.transportId == '0') {
         return harvestResponse;
     }
-    const transportResponse = await getSingleData(transportType, harvestResponse.transportId);
+    const transportResponse = await getSingleData(transportNode, harvestResponse.transportId);
     const courierResponse = await getSingleData(courierNode, transportResponse.courierId);
     return {
         ...harvestResponse,
@@ -166,18 +169,16 @@ const deleteCourier = async (id) => {
 };
 
 const saveBatch = async (batch) => {
-    return await saveData(batchType, batch);
+    return await saveData(batchNode, batch);
 };
 
 const getBatches = async (courierId) => {
     try {
         const returnValue = [];
-        const response = await getData(batchType);
-        response.forEach((data) => {
-            if (data.courierId == courierId) {
-                returnValue.push(data);
-            }
-        });
+        const querySnapshot = await db.collection(batchNode).where('courierId', '==', courierId).get();
+        for(var i = 0; i < querySnapshot.size; i++) {
+            returnValue.push(querySnapshot.docs[i].data());
+        }
         return returnValue;
     } catch (error) {
         console.log('error: ', error.message);
@@ -186,15 +187,15 @@ const getBatches = async (courierId) => {
 };
 
 const getBatch = async (id) => {
-    return await getSingleData(batchType, id);
+    return await getSingleData(batchNode, id);
 };
 
 const saveTransport = async (transport) => {
-    return await saveData(transportType, transport);
+    return await saveData(transportNode, transport);
 };
 
 const getTransport = async (id) => {
-    const transport = await getSingleData(transportType, id);
+    const transport = await getSingleData(transportNode, id);
     const harvest = await getSingleData(harvestNode, transport.harvestId);
     return {
         ...transport,
@@ -202,8 +203,17 @@ const getTransport = async (id) => {
     }
 };
 
+const getUndeliveredTransports = async (courierId) => {
+    const querySnapshot = await db.collection(transportNode).where('courierId', '==', courierId).where('status', '==', 1).get();
+    const returnValue = [];
+    for(var i = 0; i < querySnapshot.size; i++) {
+        returnValue.push(querySnapshot.docs[i].data());
+    }
+    return returnValue;
+};
+
 const deleteTransport = async (id) => {
-    return await deleteData(transportType, id);
+    return await deleteData(transportNode, id);
 };
 
 const updateTransportStatus = async (id, status) => {
@@ -212,13 +222,28 @@ const updateTransportStatus = async (id, status) => {
         const formattedDate = currentDate.getFullYear() + '-' +
             String(currentDate.getMonth() + 1).padStart(2, '0') + '-' +
             String(currentDate.getDate()).padStart(2, '0');
-        await db.collection(transportType).doc(String(id)).update({ status, deliveryDate: formattedDate});
+        await db.collection(transportNode).doc(String(id)).update({ status, deliveryDate: formattedDate});
         return 'success';
     } catch (error) {
         console.log('error: ', error.message);
         return 'failed';
     }
 };
+
+const saveTransactionLocationFile = async (transactionId, originalname, filePath) => {
+    try {
+        const destination = `${transactionId}/${originalname}`; // Firebase destination
+        
+        await bucket.upload(filePath, {
+            destination: destination
+        });
+
+        return 'success';
+    } catch (error) {
+        console.log('error: ', error.message);
+        return 'failed';
+    }
+}
 
 module.exports = {
     checkLogin,
@@ -246,5 +271,8 @@ module.exports = {
     saveTransport,
     getTransport,
     deleteTransport,
-    updateTransportStatus
+    updateTransportStatus,
+    getUndeliveredTransports,
+
+    saveTransactionLocationFile
 };
