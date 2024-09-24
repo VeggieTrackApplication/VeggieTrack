@@ -223,7 +223,7 @@ const updateTransportStatus = async (id, status) => {
             String(currentDate.getMonth() + 1).padStart(2, '0') + '-' +
             String(currentDate.getDate()).padStart(2, '0');
         await db.collection(transportNode).doc(String(id)).update({ status, deliveryDate: formattedDate});
-        return 'success';
+        return id;
     } catch (error) {
         console.log('error: ', error.message);
         return 'failed';
