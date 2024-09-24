@@ -218,10 +218,17 @@ const deleteTransport = async (id) => {
 
 const updateTransportStatus = async (id, status) => {
     try {
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June', 
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
         const currentDate = new Date();
-        const formattedDate = currentDate.getFullYear() + '-' +
-            String(currentDate.getMonth() + 1).padStart(2, '0') + '-' +
-            String(currentDate.getDate()).padStart(2, '0');
+          
+        const formattedDate = months[currentDate.getMonth()] + ' ' +
+            String(currentDate.getDate()).padStart(2, '0') + ', ' +
+            currentDate.getFullYear();
+
         await db.collection(transportNode).doc(String(id)).update({ status, deliveryDate: formattedDate});
         return id;
     } catch (error) {
