@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vegetable Dashboard</title>
+
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Leaflet-Awesome-Markers CSS and JS -->
+    <script src="
+    https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-markers.min.js
+    "></script>
+    <link href="
+https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-markers.min.css
+" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,34 +70,16 @@
             color: #999;
             font-size: 14px;
         }
-        
-        .table-container {
-            margin-top: 20px;
-            overflow-x: auto; /* Allows horizontal scrolling */
-        }
-
-        table {
-            width: 100%; /* Ensures the table takes full width of its container */
-            border-collapse: collapse;
-            min-width: 800px; /* Ensures the table doesn't get too narrow */
-        }
-
-        table th, table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-        table th {
-            background-color: #4CAF50;
-            color: white;
-        }
 
         .footer {
             margin-top: 20px;
             text-align: center;
             color: #777;
             font-size: 0.9rem;
+        }
+
+        #map {
+            height: 50vh;
         }
     </style>
 </head>
@@ -114,28 +108,16 @@
             </div>
         </div>
 
-        <div class="table-container">
+        <div>
             <h2>Transportation History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Courier</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Price From Farm</th>
-                        <th>Price From Retailer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div id="map"></div>
         </div>
 
         <div class="footer">
             © 2024 Vegetable Dashboard. All rights reserved.
         </div>
     </div>
+
     <script>
         const extractId = () => {
             const path = window.location.pathname;
@@ -178,6 +160,9 @@
             } else {
                 response.farmer = await getFarm(response.farmerId);
                 displayData(response);
+                if (response.transportLocation && response.transportLocation.length > 0) {
+                    displayMap(response.transportLocation);
+                }
             }
         }
 
@@ -191,6 +176,7 @@
             const fertilizerUsed = document.getElementById('fertilizerUsed');
             const pesticidesUsed = document.getElementById('pesticidesUsed');
             const kiloProduced = document.getElementById('kiloProduced');
+            const courier = document.getElementById('courier');
 
             farmName.innerHTML += response.farmer.farmName;
             farmLocation.innerHTML += response.farmer.farmLocation;
@@ -201,6 +187,43 @@
             fertilizerUsed.innerHTML += response.fertilizerUsed;
             pesticidesUsed.innerHTML += response.pesticidesUsed;
             kiloProduced.innerHTML += response.kiloProduced;
+            courier.innerHTML += response.courier.fullName;
+        }
+
+        const displayMap = async (transportLocation) => {
+            const map = L.map('map').setView([transportLocation[0].lat, transportLocation[0].long], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const lastIndex = transportLocation.length - 1;
+            const farmName = document.getElementById('farmName').innerText;
+            const dateObject = new Date((transportLocation[0].time).replace(' ', 'T'));
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: 'numeric', 
+                second: 'numeric',
+                hour12: true
+            };
+
+            L.marker([transportLocation[0].lat, transportLocation[0].long])
+                .addTo(map)
+                .bindTooltip(`Picked up here at ${ farmName } | ${ dateObject.toLocaleString('en-US', options) }`, { permanent: true, direction: "right" })
+                .openTooltip();
+
+            const dateObject2 = new Date((transportLocation[lastIndex].time).replace(' ', 'T')); 
+
+            L.marker([transportLocation[lastIndex].lat, transportLocation[lastIndex].long])
+                .addTo(map)
+                .bindTooltip(`Delivered here | ${ dateObject2.toLocaleString('en-US', options) }`, { permanent: true, direction: "right" })
+                .openTooltip();
+
+            const latlngs = transportLocation.map(loc => [loc.lat, loc.long]);
+            L.polyline(latlngs, { color: 'blue' }).addTo(map);
         }
 
         getHarvest(extractId());

@@ -1,6 +1,8 @@
 const firebase = require('firebase-admin/app');
 const fs = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
+const fsFile = require('fs');
+const path = require('path');
 
 const serviceAccount = require('./veggietrack-7a045-firebase-adminsdk-uf0zv-e1414b8b49.json');
 
@@ -135,12 +137,15 @@ const getHarvest = async (id) => {
     if(harvestResponse.transportId == '0') {
         return harvestResponse;
     }
+
     const transportResponse = await getSingleData(transportNode, harvestResponse.transportId);
     const courierResponse = await getSingleData(courierNode, transportResponse.courierId);
+    const transportLocation = await getTransportLocation(transportResponse.id);
     return {
         ...harvestResponse,
         transport: transportResponse,
-        courier: courierResponse
+        courier: courierResponse,
+        transportLocation: await parseLocations(await transportLocation)
     }
 };
 
@@ -239,7 +244,7 @@ const updateTransportStatus = async (id, status) => {
 
 const saveTransactionLocationFile = async (transactionId, originalname, filePath) => {
     try {
-        const destination = `${transactionId}/${originalname}`; // Firebase destination
+        const destination = `${transactionId}/${originalname}`;
         
         await bucket.upload(filePath, {
             destination: destination
@@ -250,6 +255,56 @@ const saveTransactionLocationFile = async (transactionId, originalname, filePath
         console.log('error: ', error.message);
         return 'failed';
     }
+}
+
+const getTransportLocation = async (transactionId) => {
+
+    const destination = `${ transactionId }/${transactionId}_location.txt`;
+    const destinationPath = path.join(__dirname, `${ transactionId }_location.txt`);
+    
+    try {
+
+        await bucket.file(destination).download({ destination: destinationPath });
+
+        const data = await fsFile.readFileSync(destinationPath, 'utf8');
+
+        await fsFile.unlinkSync(destinationPath);
+
+        return data;
+
+    } catch (error) {
+        console.log('error: ', error.message);
+        return 'failed';
+    }
+}
+
+const parseLocations = async (locationData) => {
+
+    const locations = [];
+    const lines = locationData.split('\n');
+
+    for(var i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim()) {
+            const latMatch = line.match(/Lat: ([\d.]+)/);
+            const longMatch = line.match(/Long: ([\d.]+)/);
+            const timeMatch = line.match(/Time: (\d+)/);
+
+            const goodLat = latMatch[1];
+            const goodLng = longMatch[1];
+            const goodTime = (line.split(',')[2]).trim().substring(6);
+
+            if (goodLat && goodLng && goodTime) {
+                locations.push({
+                    lat: parseFloat(goodLat),
+                    long: parseFloat(goodLng),
+                    time: goodTime,
+                });
+            }
+        }
+    }
+
+    return locations;
 }
 
 module.exports = {
