@@ -145,7 +145,7 @@ const getHarvest = async (id) => {
         ...harvestResponse,
         transport: transportResponse,
         courier: courierResponse,
-        transportLocation: await parseLocations(await transportLocation)
+        transportLocation: transportLocation == 'failed' ? 'No data' : await parseLocations(await transportLocation)
     }
 };
 
