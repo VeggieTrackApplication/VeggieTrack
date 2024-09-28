@@ -202,10 +202,12 @@ app.put('/get-all-harvests', async (req, res) => {
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
     var decryptedId = decrypt(id);
-    console.log('dId', decryptedId);
     if (decryptedId.length > 20) {
         decryptedId = decrypt(id);
     }
+    console.log('id', id);
+    console.log('dId', decryptedId);
+    console.log('try again', decrypt(id));
     if (decryptedId.length > 20 || !decryptedId) {
         res.send('404');
         console.log('Still not encrypted');
