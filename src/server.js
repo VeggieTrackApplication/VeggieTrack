@@ -201,7 +201,7 @@ app.put('/get-all-harvests', async (req, res) => {
 
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
-    const decryptedId = decrypt(id);
+    var decryptedId = decrypt(id);
     console.log('dId', decryptedId);
     if (decryptedId.length > 20) {
         decryptedId = decrypt(id);
