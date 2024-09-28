@@ -415,6 +415,5 @@ function decrypt(encrypted) {
 }
 
 app.listen(port, '0.0.0.0', async () => {
-    console.log(encrypt('H20240918-095511-440'));
     console.log(`Server is running at ${ port }`);
 });

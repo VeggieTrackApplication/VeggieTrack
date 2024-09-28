@@ -134,7 +134,7 @@ const getHarvests = async (farmerId) => {
 
 const getHarvest = async (id) => {
     const harvestResponse = await getSingleData(harvestNode, id);
-    if(harvestResponse.transportId == '0') {
+    if(harvestResponse.transportId.length == 1) {
         return harvestResponse;
     }
 
