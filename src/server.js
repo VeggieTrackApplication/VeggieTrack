@@ -201,7 +201,7 @@ app.put('/get-all-harvests', async (req, res) => {
 
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
-    const decryptedId = decrypt(id);
+    const decryptedId = await decrypt(id);
     if (!decryptedId) {
         res.send('404');
         return;
