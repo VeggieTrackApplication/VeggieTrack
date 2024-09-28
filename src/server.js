@@ -202,8 +202,10 @@ app.put('/get-all-harvests', async (req, res) => {
 app.put('/get-harvest', async (req, res) => {
     const { id } = req.body;
     const decryptedId = await decrypt(id);
-    if (!decryptedId) {
+    console.log('dId', decryptedId);
+    if (id == decryptedId || !decryptedId) {
         res.send('404');
+        console.log('Still not encrypted');
         return;
     }
     const response = await fb.getHarvest(decryptedId);
