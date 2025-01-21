@@ -170,7 +170,7 @@ const saveCourier = async (courier) => {
 };
 
 const saveRetailer = async (retailer) => {
-    return await saveData(retailer, retailer);
+    return await saveData(retailerNode, retailer);
 }
 
 const getCouriers = async () => {
