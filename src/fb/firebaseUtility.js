@@ -6,7 +6,16 @@ const path = require('path');
 const fs2 = require('fs');
 require('dotenv').config();
 
-const serviceAccount = JSON.parse(fs2.readFileSync(path.join(__dirname, '/etc/secrets/pk.json') , 'utf8'));
+const isRender = process.env.DEV_ENV === 'production';
+
+let serviceAccount;
+
+if (isRender) {
+    serviceAccount = JSON.parse(fs2.readFileSync('/etc/secrets/pk.json', 'utf8'));
+} else {
+    serviceAccount = JSON.parse(fs2.readFileSync(path.join(__dirname, '/etc/secrets/pk.json') , 'utf8'));
+}
+
 
 firebase.initializeApp({
     credential: firebase.cert(serviceAccount),
