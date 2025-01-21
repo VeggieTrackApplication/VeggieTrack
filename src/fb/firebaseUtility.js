@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const fsFile = require('fs');
 const path = require('path');
 
-const serviceAccount = require('./veggietrack-7a045-firebase-adminsdk-uf0zv-e1414b8b49.json');
+const serviceAccount = require('./veggietrack-7a045-firebase-adminsdk-uf0zv-ef88589cdc.json');
 
 firebase.initializeApp({
     credential: firebase.cert(serviceAccount),
