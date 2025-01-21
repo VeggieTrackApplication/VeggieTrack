@@ -254,7 +254,7 @@ const saveTransactionLocationFile = async (transactionId, originalname, filePath
 
         return 'success';
     } catch (error) {
-        console.log('error: ', error.message);
+        console.log('error saving file location: ', error.message);
         return 'failed';
     }
 }

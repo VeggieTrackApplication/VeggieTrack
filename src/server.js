@@ -151,7 +151,7 @@ app.get('/', (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const response = await fb.checkLogin(email, password);
+    const response = await fb.checkLogin(email.toLowerCase(), password.toLowerCase());
     res.send(response);
 });
 
@@ -174,6 +174,7 @@ app.get('/get-all-farmers', async (req, res) => {
 app.put('/get-farmer', async (req, res) => {
     const { id } = req.body;
     const response = await fb.getFarmer(id);
+    console.log(response);
     res.send(response);
 });
 
@@ -214,6 +215,7 @@ app.put('/get-harvest', async (req, res) => {
         return;
     }
     const response = await fb.getHarvest(decryptedId);
+    console.log(response);
     res.send(response);
 });
 
@@ -380,6 +382,8 @@ app.post('/save-transport-location-file', upload.single('file'), async (req, res
     const filePath = path.join(__dirname, '../', req.file.path);
     
     const response = await fb.saveTransactionLocationFile(transactionId, req.file.originalname, filePath);
+
+    console.log("location file status: ", response);
     
     fs.unlinkSync(filePath);
     res.send(response);
@@ -422,6 +426,7 @@ function decrypt(encrypted) {
 }
 
 app.listen(port, '0.0.0.0', async () => {
+    console.log(encrypt('H20240928-072030-245'));
     console.log(decrypt('fd3ade9742a34c6039af14231c242c877f8b999f33d60cd2e5398f8143f092f1'))
     console.log(`Server is running at ${ port }`);
 });
