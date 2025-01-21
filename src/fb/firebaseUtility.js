@@ -53,7 +53,8 @@ const getData = async (dataType) => {
             ...doc.data()
         }));
     } catch (error) {
-        console.log('error: ', error.message);
+        console.log(error);
+        console.log('error getting data: ', error.message);
         return null;
     }
 };
