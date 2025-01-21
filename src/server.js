@@ -363,7 +363,7 @@ app.post('/update-transport-status', async (req, res) => {
 app.post('/generate-qr', async (req, res) => {
     const { id } = req.body;
     try {
-        const qrCodeData = 'https://veggietrack.onrender.com/info';
+        const qrCodeData = 'https://veggietrack-0zl4.onrender.com/info';
         
         const crypted = qrCodeData + "/" + encrypt(id)
         const qrCodeBuffer = await QRCode.toBuffer(crypted);
