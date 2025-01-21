@@ -17,6 +17,7 @@ const bucket = admin.storage().bucket();
 const farmerNode = 'farmer';
 const harvestNode = 'harvest';
 const courierNode = 'courier';
+const retailerNode = 'retailer';
 const batchNode = 'batch';
 const transportNode = 'transport';
 
@@ -84,7 +85,12 @@ const checkLogin = async (email, password) => {
         if (querySnapshot.empty) {
             const newQuerySnapshot = await db.collection("courier").where('email', '==', email).where('password', '==', password).get();
             if (newQuerySnapshot.empty) {
-                return '0';
+                const newNewQuerySnapshot = await db.collection("retailer").where('email', '==', email).where('password', '==', password).get();
+                if (newNewQuerySnapshot.empty) {
+                    return '0';
+                } else {
+                    return newNewQuerySnapshot.docs[0].id;
+                }
             } else {
                 return newQuerySnapshot.docs[0].id;
             }
@@ -162,6 +168,10 @@ const updateHarvestTransportId = async (harvest) => {
 const saveCourier = async (courier) => {
     return await saveData(courierNode, courier);
 };
+
+const saveRetailer = async (retailer) => {
+    return await saveData(retailer, retailer);
+}
 
 const getCouriers = async () => {
     return await getData(courierNode);
@@ -327,6 +337,8 @@ module.exports = {
     getCouriers,
     getCourier,
     deleteCourier,
+
+    saveRetailer,
 
     saveBatch,
     getBatches,

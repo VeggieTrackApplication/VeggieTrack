@@ -151,10 +151,19 @@ app.get('/', (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const response = await fb.checkLogin(email.toLowerCase(), password.toLowerCase());
+    const response = await fb.checkLogin(email.toLowerCase(), password);
     res.send(response);
 });
 
+app.post('/save-retailer', async (req, res) => {
+    const id = generateUniqueId('R');
+    const { email, password, fullName, marketName } = req.body;
+    const retailer = {
+        id, email, password, fullName, marketName
+    };
+    const response = await fb.saveRetailer(retailer);
+    res.send(response);
+});
 
 app.post('/save-farmer', async (req, res) => {
     const id = generateUniqueId('F');
