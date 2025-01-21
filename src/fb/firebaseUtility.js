@@ -3,8 +3,10 @@ const fs = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 const fsFile = require('fs');
 const path = require('path');
+const fs2 = require('fs');
+require('dotenv').config();
 
-const serviceAccount = require('./veggietrack-7a045-firebase-adminsdk-uf0zv-ef88589cdc.json');
+const serviceAccount = JSON.parse(fs2.readFileSync(path.join(__dirname, '/etc/secrets/pk.json') , 'utf8'));
 
 firebase.initializeApp({
     credential: firebase.cert(serviceAccount),
