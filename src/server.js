@@ -118,6 +118,7 @@
  * 
  * EMAIL: veggietrack@gmail.com
  * PASSWORD: VeggieTrackApplication
+ * GITHUB: VegTrack123
  */
 
 const express = require('express');
