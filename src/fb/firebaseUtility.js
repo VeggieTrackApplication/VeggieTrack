@@ -281,6 +281,19 @@ const saveTransactionLocationFile = async (transactionId, originalname, filePath
     }
 }
 
+const saveImage = async (filename, filePath) => {
+    try {
+        await bucket.upload(filePath, {
+            destination: filename
+        });
+
+        return 'success';
+    } catch (error) {
+        console.log('error saving file image: ', error.message);
+        return 'failed';
+    }
+}
+
 const getTransportLocation = async (transactionId) => {
 
     const destination = `${ transactionId }/${transactionId}_location.txt`;
@@ -362,5 +375,6 @@ module.exports = {
     updateTransportStatus,
     getUndeliveredTransports,
 
-    saveTransactionLocationFile
+    saveTransactionLocationFile,
+    saveImage
 };

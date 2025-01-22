@@ -399,6 +399,18 @@ app.post('/save-transport-location-file', upload.single('file'), async (req, res
     res.send(response);
 });
 
+app.post('/image-upload/:fileName', upload.single('file'), async (req, res) => {
+    const { fileName } = req.params;
+    const filePath = path.join(__dirname, '../', req.file.path);
+
+    const response = await fb.saveImage(fileName, filePath);
+    console.log("location file status: ", response);
+    
+    fs.unlinkSync(filePath);
+    res.send(response);
+
+});
+
 function generateUniqueId(idType) {
     const now = new Date();
 
