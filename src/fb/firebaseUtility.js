@@ -315,6 +315,20 @@ const getTransportLocation = async (transactionId) => {
     }
 }
 
+const downloadImage = async (fileName) => {
+    try {
+        const file = bucket.file(fileName);
+        const [download] = await file.download();
+
+        return download;
+
+    } catch (error) {
+        console.log('error: ', error.message);
+        return null;
+    }
+
+};
+
 const parseLocations = async (locationData) => {
 
     const locations = [];
@@ -376,5 +390,7 @@ module.exports = {
     getUndeliveredTransports,
 
     saveTransactionLocationFile,
-    saveImage
+    saveImage,
+
+    downloadImage
 };

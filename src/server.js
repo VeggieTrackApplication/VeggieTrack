@@ -377,6 +377,19 @@ app.post('/generate-qr', async (req, res) => {
 
 });
 
+app.post('/get-image', async (req, res) => {
+    const { fileName } = req.body;
+
+    const buffer = await fb.downloadImage(fileName);
+
+    if (buffer) {
+        res.set('Content-Type', 'image/jpeg');
+        res.send(buffer);
+    } else {
+        res.status(500).send('Failed to download the image');
+    }
+});
+
 app.get('/info/:id', (req, res) => {
     res.sendFile(path.join(publicPath, 'info.html'));
 });
