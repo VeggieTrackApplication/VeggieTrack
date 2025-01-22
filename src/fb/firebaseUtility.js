@@ -138,11 +138,16 @@ const getHarvests = async (farmerId) => {
     try {
         const returnValue = [];
         const response = await getData(harvestNode);
-        response.forEach((data) => {
+        for (let i = 0; i < response.length; i++) {
+            const data = response[i];
             if (data.farmerId == farmerId) {
+                if (data.transportId != '0') {
+                    data.transport = await getTransport(data.transportId);
+                    data.transport.harvest = {};
+                }
                 returnValue.push(data);
             }
-        });
+        }
         return returnValue;
     } catch (error) {
         console.log('error: ', error.message);
