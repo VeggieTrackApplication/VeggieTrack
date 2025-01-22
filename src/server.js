@@ -196,9 +196,9 @@ app.delete('/delete-farmer', async (req, res) => {
 
 app.post('/save-harvest', async (req, res) => {
     const id = generateUniqueId('H');
-    const { farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId } = req.body;
+    const { farmerId, vegetableName, datePlanted, dateHarvested, kiloNote, kiloPrice, fertilizerUsed, pesticidesUsed, kiloProduced, transportId } = req.body;
     const harvest = {
-        id, farmerId, vegetableName, datePlanted, dateHarvested, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
+        id, farmerId, vegetableName, datePlanted, dateHarvested, kiloNote, kiloPrice, fertilizerUsed, pesticidesUsed, kiloProduced, transportId
     };
     const response = await fb.saveHarvest(harvest);
     res.send(response);
