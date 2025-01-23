@@ -425,15 +425,15 @@ app.post('/image-upload/:fileName', upload.single('file'), async (req, res) => {
 });
 
 app.post('/upload-proof', upload.single('image'), async (req, res) => {
-    const imageBuffer = req.file.buffer;
     const id = req.body.id;
 
     const decryptedId = decrypt(id);
 
     const fileName = `proof_${ decryptedId }`;
     
-    const response = await fb.saveProof(imageBuffer, fileName);
+    const response = await fb.saveProof(req.file, fileName);
 
+    fs.unlinkSync(req.file.path);
     res.send(response);
 
 });

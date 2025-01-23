@@ -309,16 +309,11 @@ const saveImage = async (filename, filePath) => {
     }
 }
 
-const saveProof = async (fileBuffer, fileName) => {
+const saveProof = async (file, fileName) => {
     try {
-        const file = bucket.file(fileName);
-        const stream = file.createWriteStream({
-            metadata: {
-                contentType: 'image/jpeg'
-            }
+        await bucket.upload(file.path, {
+            destination: fileName
         });
-    
-        stream.end(fileBuffer);
         return 'success';
     } catch (error) {
         return 'failed';
