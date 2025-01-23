@@ -212,11 +212,14 @@ const getBatches = async (courierId) => {
         const querySnapshot = await db.collection(batchNode).where('courierId', '==', courierId).get();
         for(var i = 0; i < querySnapshot.size; i++) {
             const batch = querySnapshot.docs[i].data();
-            batch.transports = [];
+            batch.status = 2;
             for (var j = 0; j < batch.transportIds.length; j++) {
                 const transport = await getTransport(batch.transportIds[j]);
                 transport.harvest = {};
-                batch.transports.push(transport);
+                
+                if (batch.status > transport.status) {
+                    batch.status = transport.status;
+                }
             }
             returnValue.push(batch);
         }
