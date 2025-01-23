@@ -211,7 +211,14 @@ const getBatches = async (courierId) => {
         const returnValue = [];
         const querySnapshot = await db.collection(batchNode).where('courierId', '==', courierId).get();
         for(var i = 0; i < querySnapshot.size; i++) {
-            returnValue.push(querySnapshot.docs[i].data());
+            const batch = querySnapshot.docs[i].data();
+            batch.transports = [];
+            for (var j = 0; j < batch.transportIds.length; j++) {
+                const transport = await getTransport(batch.transportIds[j]);
+                transport.harvest = {};
+                batch.transports.push(transport);
+            }
+            returnValue.push(batch);
         }
         return returnValue;
     } catch (error) {
