@@ -309,6 +309,22 @@ const saveImage = async (filename, filePath) => {
     }
 }
 
+const saveProof = async (fileBuffer, fileName) => {
+    try {
+        const file = bucket.file(fileName);
+        const stream = file.createWriteStream({
+            metadata: {
+                contentType: 'image/jpeg'
+            }
+        });
+    
+        stream.end(fileBuffer);
+        return 'success';
+    } catch (error) {
+        return 'failed';
+    }
+}
+
 const getTransportLocation = async (transactionId) => {
 
     const destination = `${ transactionId }/${transactionId}_location.txt`;
@@ -406,6 +422,7 @@ module.exports = {
 
     saveTransactionLocationFile,
     saveImage,
+    saveProof,
 
     downloadImage
 };
