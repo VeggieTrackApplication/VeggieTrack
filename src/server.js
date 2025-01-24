@@ -390,6 +390,20 @@ app.post('/get-image', async (req, res) => {
     }
 });
 
+app.post('/get-proof', async (req, res) => {
+    const { harvestId } = req.body;
+
+    const buffer = await fb.downloadImage(`proof_${ harvestId }`);
+
+    if (buffer) {
+        res.set('Content-Type', 'image/jpeg');
+        res.send(buffer);
+    } else {
+        res.status(500).send('Failed to download the image');
+    }
+
+});
+
 app.get('/info/:id', (req, res) => {
     res.sendFile(path.join(publicPath, 'info.html'));
 });
