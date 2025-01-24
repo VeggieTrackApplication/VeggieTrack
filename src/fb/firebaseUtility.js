@@ -281,6 +281,16 @@ const updateTransportStatus = async (id, status) => {
     }
 };
 
+const returnTransport = async (id) => {
+    try {
+        await db.collection(transportNode).doc(String(id)).update({ status: 3, deliveryDate: "Returned"});
+        return 'success';
+    } catch (error) {
+        console.log('error: ', error.message);
+        return 'failed';
+    }
+}
+
 const saveTransactionLocationFile = async (transactionId, originalname, filePath) => {
     try {
         const destination = `${transactionId}/${originalname}`;
@@ -414,6 +424,7 @@ module.exports = {
     deleteTransport,
     updateTransportStatus,
     getUndeliveredTransports,
+    returnTransport,
 
     saveTransactionLocationFile,
     saveImage,

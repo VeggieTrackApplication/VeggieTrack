@@ -404,6 +404,16 @@ app.post('/get-proof', async (req, res) => {
 
 });
 
+app.post('/return-harvest', async (req, res) => {
+    const { id } = req.body;
+
+    const harvest = await fb.getHarvest(id);
+    const transportId = harvest.transportId;
+
+    const response = await fb.returnTransport(transportId);
+    res.send(response);
+});
+
 app.get('/info/:id', (req, res) => {
     res.sendFile(path.join(publicPath, 'info.html'));
 });
