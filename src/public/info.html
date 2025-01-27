@@ -99,6 +99,7 @@ https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-
                 <p>Farm Location: <span id="farmLocation"></span></p>
                 <p>Farm Size: <span id="farmSize"></span></p>
                 <p>Vegetable Name: <span id="vegetableName"></span></p>
+                <p>Variety: <span id="variety"></span></p>
                 <p>Harvest Date: <span id="dateHarvested"></span></p>
                 <p>Date Planted: <span id="datePlanted"></span></p>
                 <p>Fertilizer Used: <span id="fertilizerUsed"></span></p>
@@ -172,6 +173,7 @@ https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-
             const farmLocation = document.getElementById('farmLocation');
             const farmSize = document.getElementById('farmSize');
             const vegetableName = document.getElementById('vegetableName');
+            const variety = document.getElementById('variety');
             const dateHarvested = document.getElementById('dateHarvested');
             const datePlanted = document.getElementById('datePlanted');
             const fertilizerUsed = document.getElementById('fertilizerUsed');
@@ -182,7 +184,7 @@ https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-
             farmName.innerHTML += response.farmer.farmName;
             farmLocation.innerHTML += response.farmer.farmLocation;
             farmSize.innerHTML += response.farmer.farmSize;
-            vegetableName.innerHTML += response.vegetableName;
+            vegetableName.innerHTML += response.variety;
             dateHarvested.innerHTML += response.dateHarvested;
             datePlanted.innerHTML += response.datePlanted;
             fertilizerUsed.innerHTML += response.fertilizerUsed;
