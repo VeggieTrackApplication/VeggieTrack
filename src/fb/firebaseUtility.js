@@ -144,6 +144,7 @@ const getHarvests = async (farmerId) => {
                 if (data.transportId != '0') {
                     data.transport = await getTransport(data.transportId);
                     data.transport.harvest = {};
+                    data.transport.courier = await getCourier(data.transport.courierId);
                 }
                 returnValue.push(data);
             }
@@ -151,7 +152,7 @@ const getHarvests = async (farmerId) => {
         return returnValue;
     } catch (error) {
         console.log('error: ', error.message);
-        return null;
+        return [];
     }
 };
 
